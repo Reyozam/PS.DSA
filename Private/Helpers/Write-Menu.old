@@ -6,8 +6,8 @@
         #Hashtable Menu
         [Parameter(Mandatory)]
         [hashtable]$MenuHashtable,
-
-        [System.ConsoleColor]$Color = "Green"
+        [System.ConsoleColor]$Color = $global:Config.Color,
+        [String]$Prompt = "Actions"
     )
 
     begin
@@ -45,8 +45,9 @@
 
         do
         {
-            Write-Host "\ " -NoNewline
-            Write-Host "Actions " -NoNewline -ForegroundColor $Color
+
+            Write-Host "`r$(' ' * $Host.UI.RawUI.WindowSize.Width)`r\ " -NoNewline
+            Write-Host "$Prompt " -NoNewline -ForegroundColor $Color
             #Write-Host " [$($Keys -join ",") OR Q to quit] " -ForegroundColor DarkYellow -NoNewline
             Write-Host "> " -NoNewline
 

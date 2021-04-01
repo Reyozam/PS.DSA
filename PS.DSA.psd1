@@ -9,10 +9,10 @@
 @{
 
 # Module de script ou fichier de module binaire associé à ce manifeste
-RootModule = 'PS-DSA.psm1'
+RootModule = 'PS.DSA.psm1'
 
 # Numéro de version de ce module.
-ModuleVersion = '0.1'
+ModuleVersion = '2021.04.01'
 
 # Éditions PS prises en charge
 # CompatiblePSEditions = @()

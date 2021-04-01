@@ -19,42 +19,55 @@
     
 #>
 
-function Start-PsDsa 
+function Start-PSDSA
 {
 
     [CmdletBinding()]
     param (
-        [Parameter(Position = 1)][string]$User
+        [Alias("u")]
+        [Parameter(Position = 0)][string]$User,
+        [Alias("d")]
+        [Parameter(Position = 1)][string]$Domain = $env:USERDOMAIN
     )
     
     # USER DEFINED VARIABLES ==========================================================================================
     # Edit these variables as needed
 
     # STATIC VARIABLES ================================================================================================
-    $Global:PDC = Get-PDC
+    $Global:PDC = Get-PDC -Domain $Domain
 
     # HELPERS FUNCTIONS ===============================================================================================
 
 
     # SCRIPT LOGIC ====================================================================================================
     #Start User Lookup
-    if ([string]::IsNullOrEmpty($User))
+    $Global:PSDSA_User = $null
+
+    if (-not ($User))
     {
-        Write-Color "Search AD User /> " -Color $Color -NoNewLine
-        $User = Read-Host
-        $Identity = SearchUserAccountName $User
+        Show-UI -ShowHeader
+        
+        Write-Color "[!] No user information provide" -Color DarkYellow -LinesBefore 1 -LinesAfter 1
+        Write-Color -Text "command: ", "ad -u <search>" -Color green, White -LinesAfter 1
     }
     else
     {
-        $Identity = SearchUserAccountName $User
+        Show-UI -ShowHeader
+        $SamAccountName = Search-User $User
+
+        if ($SamAccountName) 
+        {
+            $Global:PSDSA_User = New-Object PSDSAUser($SamAccountName,$Global:PDC) -ErrorAction Stop
+    
+            Show-UI -ShowHeader -ShowScreen -ShowMenu
+        }
+        else
+        {
+            Write-Color "[!] No user found for `"$USer`"" -Color DarkYellow -LinesBefore 1 -LinesAfter 1
+        }
+        
     }
     
-    $Global:PSDSA_User = [PSDSAUser]::new($Identity)
-    
-    ShowUserScreen -ShowHeader -ShowScreen -ShowMenu
-
-    
-
     # END  ============================================================================================================
 
 }
