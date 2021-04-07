@@ -1,6 +1,6 @@
 #Requires -Modules ActiveDirectory
 
-$Global:ModuleRoot = $PSScriptRoot
+$Script:ModuleRoot = $PSScriptRoot
 
 #Load Config
 & "$ModuleRoot\PS.DSA.Config.ps1"
