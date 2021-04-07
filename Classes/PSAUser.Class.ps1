@@ -26,6 +26,7 @@
     [datetime] $whenCreated
     [string]   $Domain
     [string]   $Server
+    [Microsoft.ActiveDirectory.Management.ADAccount]$ADObject
 
     PSDSAUser ()
     {
@@ -66,7 +67,8 @@
         $this.LastLogon = ([datetime]::FromFileTime($Found.lastLogon))
         $this.whenChanged = $Found.whenChanged
         $this.whenCreated = $Found.whenCreated
-        $this.UserPasswordExpiryTime = ([datetime]::FromFileTime($Found."msDS-UserPasswordExpiryTimeComputed"))
+        $this.UserPasswordExpiryTime = if ($Found.PasswordNeverExpires) {Get-Date -Day 1 -Month 1 -Year 2099} else {[string]([datetime]::FromFileTime($Found."msDS-UserPasswordExpiryTimeComputed"))}
+        $this.ADObject = $Found
         
         $this.Server = $Server
         $this.Domain = ($Found.CanonicalName -split "/")[0]
@@ -87,12 +89,42 @@
 
     [void] Reload ()
     {
-        $this = [PSDSAUSER]::new($this.SamAccountName,$this.server)
+        $Found = Get-ADUser -Identity $this.SamAccountName -Properties * -ErrorAction Stop -Server $this.Server
+
+        if ($null -eq $Found)
+        {
+            Write-Error "User Not Found" -ErrorAction Stop
+        }
+                
+            
+        # Fill in the object
+        $this.Name = $Found.displayname 
+        $this.SamAccountName = $Found.samaccountname 
+        $this.Title = $Found.title 
+        $this.Description = $Found.description 
+        $this.GivenName = $Found.givenname 
+        $this.Surname = $Found.sn 
+        $this.Email = $Found.mail 
+        $this.PasswordNeverExpires = $Found.PasswordNeverExpires
+        $this.PasswordNotRequired = $Found.PasswordNotRequired
+        $this.DistinguishedName = $Found.distinguishedname 
+        $this.UserPrincipalName = $Found.userprincipalname 
+        $this.MemberOf = $Found.memberof
+        $this.Manager = $Found.manager 
+        $this.LockedOut = $Found.LockedOut
+        $this.BadPasswordCount = $Found.badpwdcount 
+        $this.PasswordExpired = $Found.PasswordExpired
+        $this.PasswordLastSet = $Found.PasswordLastSet
+        $this.Enabled = $Found.Enabled
+        $this.LastLogon = [datetime]::FromFileTime($Found.lastLogon)
+        $this.whenChanged = $Found.whenChanged
+
+        $this.Domain = ($Found.CanonicalName -split "/")[0]
     }
 
     [void] ShowAllAttributes ()
     {
-        Write-Host ($this | Format-List * | Out-String)
+        Write-Host ($this.ADObject | Select-Object -ExcludeProperty memberof | Format-List * | Out-String)
     } 
 
     [void] ShowGroups ()

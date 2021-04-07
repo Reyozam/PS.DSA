@@ -43,7 +43,7 @@
         Write-Color "STATE            | " -Color $Config.Color  -NoNewLine
         if ($PSDSA_User.Enabled -eq $true) { Write-Color " ENABLED " -Color $host.ui.RawUI.BackgroundColor -BackGroundColor Green -NoNewLine }
         else { Write-Color " DISABLED " -Color $host.ui.RawUI.BackgroundColor -BackGroundColor Red -NoNewLine }
-        Write-Host " | " -NoNewline
+        Write-Host "  " -NoNewline
         if ($PSDSA_User.LockedOut -eq $true) { Write-Color " LOCKED " -Color $host.ui.RawUI.BackgroundColor -BackGroundColor Red }
         else { Write-Color " UNLOCKED " -Color $host.ui.RawUI.BackgroundColor -BackGroundColor Green }
 
@@ -60,9 +60,13 @@
 
         #PASSWORD EXPIRATION
         Write-Color "PWD EXPIRATION   | " -Color $Config.Color -NoNewLine
-        if ($(Get-Date) -ge $PSDSA_User.UserPasswordExpiryTime) { Write-Color "$(Get-Date $PSDSA_User.UserPasswordExpiryTime -f "dd/MM/yy hh:mm")" -Color "Red" } 
-        else { Write-Color "$(Get-Date $PSDSA_User.UserPasswordExpiryTime -f "dd/MM/yy hh:mm")" -Color "White"  }
-
+        if ($PSDSA_User.PasswordNeverExpires) { Write-Color "Never Expires" -Color DarkYellow }
+        else
+        {
+            if ($(Get-Date) -ge $PSDSA_User.UserPasswordExpiryTime) { Write-Color "$(Get-Date $PSDSA_User.UserPasswordExpiryTime -f "dd/MM/yy hh:mm")" -Color "Red" } 
+            else { Write-Color "$(Get-Date $PSDSA_User.UserPasswordExpiryTime -f "dd/MM/yy hh:mm")" -Color "White" }
+        }
+        
         #LAST CHANGE
         Write-Color "LAST CHANGE      | ", "$(Get-Date $PSDSA_User.WhenChanged -f "dd/MM/yy hh:mm")" -Color $Config.Color , White
         

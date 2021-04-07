@@ -17,9 +17,9 @@ else
 
 if ($PSDSA_User.LockedOut -eq $true)
 {
-    $Menu.Add("Unlock Account",{$global:PSDSA_UserMainMenu.Unlock() ; Wait})
+    $Menu.Add("Unlock Account",{$global:PSDSA_User.Unlock() ; Wait})
 }
 
-$Menu.Add("Quit",{ break })
+$Menu.Add("[x] QUIT",{ break })
 
 return $Menu
