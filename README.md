@@ -20,7 +20,13 @@ git clone https://github.com/Reyozam/PS.DSA.git
 Import-Module PS.DSA
 ```
 
+#### Utilisation
 
+```powershell
+ad < user to search >
+```
+
+____
 
 #### Fonctions
 
