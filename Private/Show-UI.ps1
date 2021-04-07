@@ -31,7 +31,7 @@
         Write-Color "CREATED        | ", "$($PSDSA_User.whenCreated)" -Color $Config.Color , White 
 
         #OU
-        [array]$OUs = ("$( $PSDSA_User.DistinguishedName -replace '^.*?,(..=.*)$', '$1')" -split "," | Where-Object { $_ -like "OU=*" }) -replace "OU="
+        [array]$OUs = ("$( $PSDSA_User.DistinguishedName -replace '^.*?,(..=.*)$', '$1')" -split "," | Where-Object { $_ -match "OU=|CN=" }) -replace "OU=|CN=" 
         [array]::Reverse($OUs)
         $OUPath = $OUs -join " > "
         Write-Color "OU             | ", "$OUPath" -Color $Config.Color , White
