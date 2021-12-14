@@ -1,5 +1,5 @@
 function Show-Menu {
-    param ($menuItems, $menuPosition, $Multiselect, $selection)
+    param ($menuItems, $menuPosition, $Multiselect, $selection,$Cursor,$Color)
     $l = $menuItems.length
     for ($i = 0; $i -le $l;$i++) {
 		if ($null -ne $menuItems[$i]){
@@ -14,7 +14,7 @@ function Show-Menu {
 				}
 			}
 			if ($i -eq $menuPosition) {
-				Write-Host "> $($item)" -ForegroundColor Green
+				Write-Host "$($Cursor) $($item)" -ForegroundColor $Color
 			} else {
 				Write-Host "  $($item)"
 			}
@@ -35,14 +35,14 @@ function Format-Selection {
 }
 
 function Write-Menu {
-    param ([array]$menuItems, [switch]$ReturnIndex=$false, [switch]$Multiselect)
+    param ([array]$menuItems, [switch]$ReturnIndex=$false, [switch]$Multiselect,[string]$Color = "Green" ,[string]$Cursor = ">")
     $vkeycode = 0
     $pos = 0
     $selection = @()
     [console]::CursorVisible=$false #prevents cursor flickering
     if ($menuItems.Length -gt 0)
 	 {
-		Show-Menu $menuItems $pos $Multiselect $selection
+		Show-Menu $menuItems $pos $Multiselect $selection $Cursor $Color
 		While ($vkeycode -ne 13 -and $vkeycode -ne 27) {
 			$press = $host.ui.rawui.readkey("NoEcho,IncludeKeyDown")
 			$vkeycode = $press.virtualkeycode
@@ -56,7 +56,7 @@ function Write-Menu {
 			{
 			   $startPos = [System.Console]::CursorTop - $menuItems.Length
 				[System.Console]::SetCursorPosition(0, $startPos)
-				Show-Menu $menuItems $pos $Multiselect $selection
+				Show-Menu $menuItems $pos $Multiselect $selection $Cursor $Color
 			}
 		}
 	}

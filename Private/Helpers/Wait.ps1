@@ -1,6 +1,5 @@
 ﻿Function Wait ()
 {
-    Write-Color " Press a key to continue " -BackGroundColor White -Color Black -LinesBefore 1
-    [Console]::ReadKey($true) | Out-Null
+    $null = Write-Menu -menuItems "Return" -Color "Red" -Cursor "<<"
     Show-UI -ShowHeader -ShowScreen -ShowMenu
 } 

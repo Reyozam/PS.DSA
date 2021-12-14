@@ -24,59 +24,75 @@
      
         Write-TitleBar "INFO" -Width $Config.Width -Center
 
-        Write-Color "SAMACCOUNTNAME | ", "$($PSDSA_User.SamAccountName) " -Color $Config.Color , White
-        Write-Color "NAME           | ", "$($PSDSA_User.Name)" -Color $Config.Color , White
-        Write-Color "DESCRIPTION    | ", "$($PSDSA_User.description)" -Color $Config.Color , White  
-        Write-Color "EMAIL          | ", "$($PSDSA_User.Email)" -Color $Config.Color , White  
-        Write-Color "CREATED        | ", "$($PSDSA_User.whenCreated)" -Color $Config.Color , White 
-
-        #OU
-        [array]$OUs = ("$( $PSDSA_User.DistinguishedName -replace '^.*?,(..=.*)$', '$1')" -split "," | Where-Object { $_ -match "OU=|CN=" }) -replace "OU=|CN=" 
-        [array]::Reverse($OUs)
-        $OUPath = $OUs -join " > "
-        Write-Color "OU             | ", "$OUPath" -Color $Config.Color , White
-
-
+        Write-Host "SAMACCOUNTNAME   | " -ForegroundColor $Config.Color -NoNewline ; Write-Host "$($PSDSA_User.SamAccountName) "
+        Write-Host "NAME             | " -ForegroundColor $Config.Color -NoNewline ; Write-Host "$($PSDSA_User.Name)"
+        Write-Host "DESCRIPTION      | " -ForegroundColor $Config.Color -NoNewline ; Write-Host "$($PSDSA_User.description)" 
+        Write-Host "EMAIL            | " -ForegroundColor $Config.Color -NoNewline ; Write-Host "$($PSDSA_User.Email)" 
+        Write-Host "CREATED          | " -ForegroundColor $Config.Color -NoNewline ; Write-Host "$($PSDSA_User.whenCreated)"
+        Write-Host "LAST CHANGE      | " -ForegroundColor $Config.Color -NoNewline  ; Write-Host "$(Get-Date $PSDSA_User.WhenChanged -f "dd/MM/yy hh:mm")" 
+        Write-Host "OU               | " -ForegroundColor $Config.Color -NoNewline ; Write-Host "$(($PSDSA_User.DistinguishedName -split "," | Select-Object -Skip 1) -join ",")" 
+        
         Write-TitleBar "STATUS" -Width $Config.Width -Center
 
-        #STATE LOCKED OUT
-        Write-Color "STATE            | " -Color $Config.Color  -NoNewLine
-        if ($PSDSA_User.Enabled -eq $true) { Write-Color " ENABLED " -Color $host.ui.RawUI.BackgroundColor -BackGroundColor Green -NoNewLine }
-        else { Write-Color " DISABLED " -Color $host.ui.RawUI.BackgroundColor -BackGroundColor Red -NoNewLine }
-        Write-Host "  " -NoNewline
-        if ($PSDSA_User.LockedOut -eq $true) { Write-Color " LOCKED " -Color $host.ui.RawUI.BackgroundColor -BackGroundColor Red }
-        else { Write-Color " UNLOCKED " -Color $host.ui.RawUI.BackgroundColor -BackGroundColor Green }
+        #STATE ENABLED ---------------------------------------------------------------
+        Write-Host "STATE            | " -ForegroundColor $Config.Color  -NoNewLine
+        if ($PSDSA_User.Enabled -eq $true) 
+        { 
+            Write-Host " ENABLED " -ForegroundColor $host.ui.RawUI.BackgroundColor -BackGroundColor Green -NoNewLine
+        }
+        else 
+        { 
+            Write-Host " DISABLED " -ForegroundColor $host.ui.RawUI.BackgroundColor -BackGroundColor Red -NoNewLine
+        }
+        #STATE LOCKED OUT---------------------------------------------------------------
+        Write-Host " - " -NoNewline
+        if ($PSDSA_User.LockedOut -eq $true) 
+        { 
+            Write-Host " LOCKED " -ForegroundColor $host.ui.RawUI.BackgroundColor -BackGroundColor Red 
+        }
+        else 
+        { 
+            Write-Host " UNLOCKED " -ForegroundColor $host.ui.RawUI.BackgroundColor -BackGroundColor Green 
+        }
 
 
-        #LASTLOGONDATE
-        Write-Color "LAST LOGON       | " -Color $Config.Color -NoNewLine
-        if ((New-TimeSpan -Start $PSDSA_User.LastLogon -End (Get-Date)).Days -ge $Config.DaysBeforeAlert) { Write-Color "$(Get-Date $($PSDSA_User.LastLogon) -f "dd/MM/yy hh:mm")" -Color "DarkYellow" } 
-        else { Write-Color "$(Get-Date $($PSDSA_User.LastLogon) -f "dd/MM/yy hh:mm")" -Color "White" }
-
+        # LASTLOGONDATE ---------------------------------------------------------------
+        
+        Write-Host "LAST LOGON       | " -ForegroundColor $Config.Color -NoNewLine
+        Write-TimeSpanLabel -Date $PSDSA_User.LastLogon
+   
         #PASSWORD LAST SET
-        Write-Color "LAST PASSWORDSET | " -Color $Config.Color -NoNewLine
-        if ((New-TimeSpan -Start $PSDSA_User.PasswordLastSet -End (Get-Date)).Days -ge $Config.DaysBeforeAlert) { Write-Color "$(Get-Date $PSDSA_User.PasswordLastSet -f "dd/MM/yy hh:mm")" -Color "DarkYellow" } 
-        else { Write-Color "$(Get-Date $PSDSA_User.PasswordLastSet -f "dd/MM/yy hh:mm")" -Color "White" }
+        Write-Host "LAST PASSWORDSET | " -ForegroundColor $Config.Color -NoNewLine
+        Write-TimeSpanLabel -Date $PSDSA_User.PasswordLastSet
 
         #PASSWORD EXPIRATION
-        Write-Color "PWD EXPIRATION   | " -Color $Config.Color -NoNewLine
-        if ($PSDSA_User.PasswordNeverExpires) { Write-Color "Never Expires" -Color DarkYellow }
-        else
-        {
-            if ($(Get-Date) -ge $PSDSA_User.UserPasswordExpiryTime) { Write-Color "$(Get-Date $PSDSA_User.UserPasswordExpiryTime -f "dd/MM/yy hh:mm")" -Color "Red" } 
-            else { Write-Color "$(Get-Date $PSDSA_User.UserPasswordExpiryTime -f "dd/MM/yy hh:mm")" -Color "White" }
-        }
+        Write-Host "PWD EXPIRATION   | " -ForegroundColor $Config.Color -NoNewLine
+        if ($PSDSA_User.PasswordNeverExpires) { Write-Host "Never Expires" -ForegroundColor DarkYellow }
+        else { Write-TimeSpanLabel -Date $PSDSA_User.UserPasswordExpiryTime -DateInTheFuture }
         
         #LAST CHANGE
-        Write-Color "LAST CHANGE      | ", "$(Get-Date $PSDSA_User.WhenChanged -f "dd/MM/yy hh:mm")" -Color $Config.Color , White
+        Write-Host "LAST CHANGE      | " -ForegroundColor $Config.Color -NoNewline 
+        Write-Host "$(Get-Date $PSDSA_User.WhenChanged -f "dd/MM/yy hh:mm")" 
+
+         if ($Config.UserAdditionalAttributes.count -gt 0)
+         {
+             Write-TitleBar "ADDITIONALS ATTRIBUTES" -Width $Config.Width -Center
+             $MaxLength = $Config.UserAdditionalAttributes | % {$_.length} | Sort-Object -Descending | Select-Object -First 1
+             foreach ($attributes in $Config.UserAdditionalAttributes) 
+             {
+                 Write-Host ("{0,-$MaxLength} = " -f $attributes) -ForegroundColor $Config.Color -NoNewline
+                 Write-Host "$($PSDSA_User.ADObject.$attributes.ToString())"
+             }
+
+         }
         
     }
 
     if ($ShowMenu)
     {
-        Write-TitleBar "Select an action - [UP / DOWN to navigate - ENTER to select]" -Width $Config.Width
-        $global:PSDSA_UserMainMenu = . "$ModuleRoot\Private\Menus\user.menu.ps1"
-        $Choice = Write-Menu -menuItems $PSDSA_UserMainMenu.Keys -ReturnIndex
+        Write-TitleBar "Select an action - [UP / DOWN to navigate - ENTER to select]" -Width $Config.Width -center
+        $global:PSDSA_UserMainMenu = . "$ModuleRoot\Menus\menu.user.ps1"
+        $Choice = Write-Menu -menuItems $PSDSA_UserMainMenu.Keys -ReturnIndex -Color $Config.HightLight -Cursor ">"
 
         $PSDSA_UserMainMenu[$Choice].Invoke()
     }
