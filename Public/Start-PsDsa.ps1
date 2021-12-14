@@ -39,7 +39,7 @@ function Start-PSDSA
     # HELPERS FUNCTIONS ===============================================================================================
 
 
-    # SCRIPT LOGIC ====================================================================================================
+    # USER ====================================================================================================
     #Start User Lookup
     $Global:PSDSA_User = $null
 
@@ -53,7 +53,7 @@ function Start-PSDSA
     else
     {
         Show-UI -ShowHeader
-        $SamAccountName = Search-User $User
+        $SamAccountName = Search-UserADAccount $User
 
         if ($SamAccountName) 
         {

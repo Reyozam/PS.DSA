@@ -1,10 +1,20 @@
-#Requires -Modules ActiveDirectory
+$ErrorActionPreference = "SilentlyContinue"
+try 
+{
+    Import-Module ActiveDirectory -ErrorAction Stop    
+}
+catch 
+{
+    Write-Warning "Impossible de charger le module ActiveDirectory"
+    break
+}
 
 $Script:ModuleRoot = $PSScriptRoot
 
 #Load Config
-& "$ModuleRoot\PS.DSA.Config.ps1"
+$global:config = Import-PowerShellDataFile "$ModuleRoot\PS.DSA.config"
 
+#Load Functions
 $Public = @( Get-ChildItem -Path $ModuleRoot\Public\*.ps1 -Recurse -ErrorAction SilentlyContinue )
 $Private = @( Get-ChildItem -Path $ModuleRoot\Private\*.ps1 -Recurse -ErrorAction SilentlyContinue )
 $Classes = @( Get-ChildItem -Path $ModuleRoot\Classes\*.ps1 -Recurse -ErrorAction SilentlyContinue )

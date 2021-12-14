@@ -1,4 +1,4 @@
-﻿function Search-User
+﻿function Search-UserADAccount
 {
     [CmdletBinding()]
     Param (
@@ -27,6 +27,7 @@
             }
 
             Write-Color "Select a user:" -LinesBefore 1 -Color Green
+            Write-host ""
             $Index = Write-Menu @($UserChoiceMenu.Keys)
 
             return $UserChoiceMenu[$Index]

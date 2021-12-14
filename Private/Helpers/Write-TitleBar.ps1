@@ -7,6 +7,7 @@
         [Parameter()][switch]$Center
     )
     
+    
     if ($Center)
     {
         for ($i = 0; $i -lt (([Math]::Max(0, $Width / 2) - [Math]::Max(0, $Message.Length / 2))); $i++)
@@ -26,7 +27,7 @@
     }
     
     $String = $string.toupper()
-    Write-Host ""
+    Write-Host "`r"
     Write-Host $String -BackgroundColor $Color -ForegroundColor $host.ui.RawUI.BackgroundColor
     Write-Host ""
 }

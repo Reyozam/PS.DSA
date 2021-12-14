@@ -26,7 +26,7 @@
     [datetime] $whenCreated
     [string]   $Domain
     [string]   $Server
-    [Microsoft.ActiveDirectory.Management.ADAccount]$ADObject
+    <#[Microsoft.ActiveDirectory.Management.ADAccount]#> $ADObject
 
     PSDSAUser ()
     {
@@ -124,7 +124,7 @@
 
     [void] ShowAllAttributes ()
     {
-        Write-Host ($this.ADObject | Select-Object -ExcludeProperty memberof | Format-List * | Out-String)
+        Write-Host ($this.ADObject | Select-Object -ExcludeProperty memberof | Out-String)
     } 
 
     [void] ShowGroups ()
@@ -148,9 +148,9 @@
     {
         try 
         {
-            Write-Color "[>]", " Unlock Account : $($this.SamAccountName)" -NoNewLine -Color "Green", "White"
+            
             Unlock-ADAccount -Identity $this.SamAccountName -Server $this.Server -ErrorAction Stop
-            Write-Color "OK" -Color Green -StartTab 1
+            Write-Color "[+]  $($this.SamAccountName) Unlocked !" -Color "Green", "White"
         }
         catch 
         {
