@@ -12,7 +12,7 @@
 RootModule = 'PS.DSA.psm1'
 
 # Numéro de version de ce module.
-ModuleVersion = '2021.04.07'
+ModuleVersion = '2022.12.01'
 
 # Éditions PS prises en charge
 # CompatiblePSEditions = @()

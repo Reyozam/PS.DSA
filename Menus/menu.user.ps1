@@ -1,9 +1,10 @@
 ﻿#USER MENU STRUCTURE
 $Menu = [ordered]@{
 
-    "Show All Attributes" = { Show-UI -ShowHeader ; Write-TitleBar "All attributes" -Width $Config.Width ; $Global:PSDSA_User.ShowAllAttributes() ; Wait }
+    "Show All Attributes" = { Show-UI -ShowHeader ; Write-TitleBar "All attributes" -Width $Config.Width ; $Global:PSDSA_User.ShowAllAttributes() ;  Wait }
     "Get User Groups"     = { Show-UI -ShowHeader ; Write-TitleBar "Groups Membership" -Width $Config.Width ; $Global:PSDSA_User.ShowGroups() ; Wait }
     "Reset Password"      = { Show-UI -ShowHeader ; Write-TitleBar "Reset Password" -Width $Config.Width ; $global:PSDSA_User.ResetPassword($Config.PasswordLength) ; Wait  }
+
 }
 
 if ($PSDSA_User.Enabled -eq $true)
@@ -20,6 +21,8 @@ if ($PSDSA_User.LockedOut -eq $true)
     $Menu.Add("Unlock Account",{$global:PSDSA_User.Unlock() ; Wait})
 }
 
+
+$Menu.Add("[@] Refresh" , { $global:PSDSA_User.Reload() ; Show-UI -ShowHeader -ShowScreen -ShowMenu  } )
 $Menu.Add("[x] QUIT",{ break })
 
 return $Menu

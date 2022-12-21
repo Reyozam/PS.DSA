@@ -1,9 +1,11 @@
+#requires -Version 7
+
 $ErrorActionPreference = "SilentlyContinue"
-try 
+try
 {
-    Import-Module ActiveDirectory -ErrorAction Stop    
+    Import-Module ActiveDirectory -ErrorAction Stop
 }
-catch 
+catch
 {
     Write-Warning "Impossible de charger le module ActiveDirectory"
     break

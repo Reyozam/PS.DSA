@@ -4,34 +4,22 @@
     Param (
         [Parameter(Mandatory = $true)]
         [Alias("User", "UserName", "SamAccountName", "Name")]
-        [string]$Search
+        [string]$Search,
+        [string]$Server = $env:USERDNSDOMAIN
     )
-    
-    try 
+
+    try
     {
-        $Found = Get-ADUser $Search -Properties *, msDS-UserPasswordExpiryTimeComputed -ErrorAction Stop -Server $Global:PDC
-        return $Found.SamAccountName
+        $Found = Get-ADUser $Search -Server $Server
+        return $Found
     }
     catch
     {
         $Lookup = "*" + $Search + "*" -replace " ", "*"
-        $Found = Get-ADUser -Filter { (SamAccountName -like $Lookup) -or (Name -like  $Lookup) } -Server $Global:PDC
+        $Found = Get-ADUser -Filter { (SamAccountName -like $Lookup) -or (Name -like  $Lookup) } -Server $Server
 
-        If (@($Found).Count -gt 1)
-        {
-            $UserChoiceMenu = @{}
-            
-            $Found | ForEach-Object {
-                
-                $UserChoiceMenu.Add("[$($_.SamAccountName)] $($_.Name)",$_.SamAccountName)
-            }
+        return $Found
 
-            Write-Color "Select a user:" -LinesBefore 1 -Color Green
-            Write-host ""
-            $Index = Write-Menu @($UserChoiceMenu.Keys)
-
-            return $UserChoiceMenu[$Index]
-        }
     }
 }
 
