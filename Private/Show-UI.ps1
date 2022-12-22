@@ -14,9 +14,9 @@
         Write-Host "|  _  |   __| |    \|   __|  _  |       "
         Write-Host "|   __|__   |_|  |  |__   |     |       "
         Write-Host "|__|  |_____|_|____/|_____|__|__| v$((Get-Module PS.DSA).Version.ToString())  "
-        Write-Host "Domain: " -ForegroundColor $Config.Color -NoNewline          ; Write-Host  $env:USERDNSDOMAIN -NoNewline
+        Write-Host "Domain: " -ForegroundColor $Config.Color -NoNewline          ; Write-Host  $PSDSA_User.Domain -NoNewline
         Write-Host "`tConnected On: " -ForegroundColor $Config.Color -NoNewline  ; Write-Host $Global:PDC  -NoNewline
-        Write-Host "`tLogon As: " -ForegroundColor $Config.Color -NoNewline      ; if ($null -ne $PSDSA_User.CommandsParam.Credential.UserName ) { Write-Host $PSDSA_User.CommandsParam.Credential.UserName -ForegroundColor DarkYellow } else {Write-Host $env:USERNAME}
+        Write-Host "`tLogon As: " -ForegroundColor $Config.Color -NoNewline      ; if ($null -ne $PSDSA_User.CommandsParam.Credential.UserName) { Write-Host $PSDSA_User.CommandsParam.Credential.UserName -ForegroundColor DarkYellow } else {Write-Host $env:USERNAME}
     }
 
     if ($ShowScreen)
@@ -59,11 +59,11 @@
         # LASTLOGONDATE ---------------------------------------------------------------
 
         Write-Host "LAST LOGON       | " -ForegroundColor $Config.Color -NoNewLine
-        Write-TimeSpanLabel -Date $PSDSA_User.Properties.LastLogonDate
+        if ($PSDSA_User.Properties.LastLogonDate) { Write-TimeSpanLabel -Date $PSDSA_User.Properties.LastLogonDate } else {Write-Host ""}
 
         #PASSWORD LAST SET
         Write-Host "LAST PASSWORDSET | " -ForegroundColor $Config.Color -NoNewLine
-        Write-TimeSpanLabel -Date $PSDSA_User.Properties.PasswordLastSet
+        if ($PSDSA_User.Properties.PasswordLastSet) { Write-TimeSpanLabel -Date $PSDSA_User.Properties.PasswordLastSet } else {Write-Host ""}
 
         #PASSWORD EXPIRATION
         Write-Host "PWD EXPIRATION   | " -ForegroundColor $Config.Color -NoNewLine
@@ -81,7 +81,7 @@
              foreach ($attributes in $Config.UserAdditionalAttributes)
              {
                  Write-Host ("{0,-$MaxLength} = " -f $attributes) -ForegroundColor $Config.Color -NoNewline
-                 Write-Host "$($PSDSA_User.Properties.$attributes.ToString())"
+                 if ($PSDSA_User.Properties.$attributes) { Write-Host "$($PSDSA_User.Properties.$attributes.ToString())"} else {Write-Host ""}
              }
 
          }

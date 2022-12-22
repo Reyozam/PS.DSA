@@ -8,6 +8,8 @@
         [int]$DaysBeforeAlert = 90
     )
 
+    if ($null -eq $Date) { Write-Host "" ; return}
+
     $Now = Get-Date
     #$Now.ToString("dd/MM/yy hh:mm")
     $TimeSpan = New-TimeSpan -Start $Date -End $Now

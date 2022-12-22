@@ -28,7 +28,7 @@
         $this.Properties = Get-ADUser -Identity $this.Properties.SamAccountName -Properties *, 'msDS-UserPasswordExpiryTimeComputed' -ErrorAction Continue -Server $this.Server
         $this.LastActivityDate = $this.Properties.LastLogonDate, $this.Properties.PasswordLastSet, $this.Properties.Created | Sort-Object -Descending | Select-Object -First 1
         $this.PasswordExpireTime = if ($this.Properties.PasswordNeverExpires) { $null } else { [string]([datetime]::FromFileTime($this.Properties.'msDS-UserPasswordExpiryTimeComputed')) }
-        
+
     }
 
     [void] ShowAllAttributes ()
@@ -117,12 +117,8 @@
             Identity    = $this.Properties.SamAccountName
             Enabled     = $true
             ErrorAction = 'Stop'
-            Server      = $this.Domain
-        }
-        if ($this.Credentials)
-        {
-            $Params['Credential'] = $this.Credentials
-        }
+        } + $this.CommandsParam
+
 
         Set-ADUser @Params
         $this.Reload()
@@ -134,28 +130,11 @@
             Identity    = $this.Properties.SamAccountName
             Enabled     = $false
             ErrorAction = 'Stop'
-            Server      = $this.Domain
-        }
-        if ($this.Credentials)
-        {
-            $Params['Credential'] = $this.Credentials
-        }
+        } + $this.CommandsParam
+
 
         Set-ADUser @Params
         $this.Reload()
-
-
-        # try
-        # {
-        #     Set-ADUser -Identity $this.Properties.SamAccountName -Enabled $false -ErrorAction Stop -Server $this.Domain
-        #     Write-Color "[+] Account Disabled" -Color Green -LinesBefore 1
-        # }
-        # catch
-        # {
-        #     Write-Color "[x] ", $($_.Exception.Message) -Color Red -LinesBefore 1
-        # }
-
-        # $this.Reload()
     }
 
 }

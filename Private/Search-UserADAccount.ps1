@@ -10,7 +10,7 @@
 
     try
     {
-        $Found = Get-ADUser $Search -Server $Server
+        $Found = Get-ADUser $Search -Server $Server -ErrorAction Stop
         return $Found
     }
     catch

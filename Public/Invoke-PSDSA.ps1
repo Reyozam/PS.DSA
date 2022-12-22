@@ -39,7 +39,7 @@ function Invoke-PSDSA
     # Edit these variables as needed
 
     # STATIC VARIABLES ================================================================================================
-    $PDC = Get-ADDomain -Server $Domain | Select-Object -ExpandProperty PDCEmulator
+    $Global:PDC = Get-ADDomain -Server $Domain | Select-Object -ExpandProperty PDCEmulator
 
     # USER ====================================================================================================
     #Start User Lookup
@@ -55,15 +55,15 @@ function Invoke-PSDSA
     else
     {
         Show-UI -ShowHeader
-        $SearchResult = Search-UserADAccount -Search $Identity -Server $PDC
+        $SearchResult = Search-UserADAccount -Search $Identity -Server $Global:PDC
 
-        if ($SearchResult.count -eq 1)
+        if (($SearchResult | Measure-Object).Count -eq 1)
         {
             $Global:PSDSA_User = New-Object PSDSA_User($SearchResult.SamAccountName, $Global:PDC) -ErrorAction Stop
             if ($null -ne $Credential.UserName) { $Global:PSDSA_User.CommandsParam.Add('Credential', $Credential) }
             Show-UI -ShowHeader -ShowScreen -ShowMenu
         }
-        elseif ($SearchResult.count -gt 1)
+        elseif (($SearchResult | Measure-Object).Count -gt 1)
         {
             Show-UI -ShowHeader
             $UserChoiceMenu = @{}
@@ -93,6 +93,6 @@ function Invoke-PSDSA
 
 }
 
-New-Alias -Name ad -Value Invoke-PsDsa -Scope global -ErrorAction SilentlyContinue
+New-Alias -Name ad -Value Invoke-PsDsa -Scope global -ErrorAction Ignore
 
 

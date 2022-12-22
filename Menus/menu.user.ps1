@@ -7,21 +7,21 @@ $Menu = [ordered]@{
 
 }
 
-if ($PSDSA_User.Enabled -eq $true)
+if ($PSDSA_User.Properties.Enabled -eq $true)
 {
-    $Menu.Add("Disable Account",{$PSDSA_User.DisableAccount() ; Wait})
+    $Menu.Add("Disable Account",{$PSDSA_User.DisableAccount() ; Show-UI -ShowHeader -ShowScreen -ShowMenu})
 }
 else
 {
-    $Menu.Add("Enable Account",{$global:PSDSA_User.EnableAccount() ; Wait})
+    $Menu.Add("Enable Account",{$global:PSDSA_User.EnableAccount() ; Show-UI -ShowHeader -ShowScreen -ShowMenu})
 }
 
-if ($PSDSA_User.LockedOut -eq $true)
+if ($PSDSA_User.Properties.LockedOut -eq $true)
 {
     $Menu.Add("Unlock Account",{$global:PSDSA_User.Unlock() ; Wait})
 }
 
-
+#$Menu.Add("[#] Search another account" , { Show-UI -ShowHeader ; Write-Host "Enter user to search: " -ForegroundColor Green -NoNewline ; $Search = Read-Host ; Invoke-PSDSA -Identity $Search -Domain $global:PSDSA_User.Domain  } )
 $Menu.Add("[@] Refresh" , { $global:PSDSA_User.Reload() ; Show-UI -ShowHeader -ShowScreen -ShowMenu  } )
 $Menu.Add("[x] QUIT",{ break })
 
